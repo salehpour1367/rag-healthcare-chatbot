@@ -1,0 +1,28 @@
+# Virtual environment
+.venv/
+venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Environment variables and secrets
+.env
+.streamlit/secrets.toml
+
+# IDE files
+.idea/
+.vscode/
+
+# Uploaded user documents
+data/uploads/
+
+# Temporary databases
+uploaded_chroma_db/
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
