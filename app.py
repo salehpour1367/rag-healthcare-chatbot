@@ -132,9 +132,12 @@ def process_uploaded_pdfs(uploaded_files, active_vectorstore):
         raise ValueError(
             "No readable text chunks were created from the uploaded PDFs."
         )
+    st.write(f"Pages loaded: {len(all_documents)}")
+    st.write(f"Chunks created: {len(chunks)}")
 
     # Add documents first
     active_vectorstore.add_documents(chunks)
+    st.success("Documents added to Chroma!")
 
     # Save hashes only after successful database insertion
     for file_hash in pending_hashes:
