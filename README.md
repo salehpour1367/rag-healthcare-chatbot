@@ -1,86 +1,127 @@
-# Healthcare RAG Chatbot
+# 🩺 Healthcare RAG Chatbot
 
-A Retrieval-Augmented Generation (RAG) chatbot that answers healthcare-related questions using information retrieved from PDF documents.
+An AI-powered Retrieval-Augmented Generation (RAG) chatbot that answers healthcare-related questions using PDF documents.
 
-The application includes a built-in healthcare knowledge base and allows users to upload additional PDF documents to expand the knowledge base.
+The chatbot combines semantic search with a Large Language Model (LLM) to retrieve relevant information from healthcare PDFs and generate accurate, context-based answers.
+
+---
 
 ## Features
 
-- Retrieval-Augmented Generation (RAG)
-- Built-in healthcare document knowledge base
-- Upload one or multiple PDF documents
-- Automatic PDF processing
-- Text chunking and embedding generation
-- Semantic search using ChromaDB
-- Local LLM integration with Ollama
-- Llama 3.2 model for answer generation
-- Source document and page citations
-- Relevance score filtering
-- Duplicate PDF detection using SHA-256 hashing
-- Persistent vector database
-- Chat history
-- Streamlit web interface
+- 📄 Ask questions about healthcare PDF documents
+- 📚 Built-in healthcare knowledge base
+- ➕ Upload one or multiple PDF files
+- 🔍 Semantic search using vector embeddings
+- 🤖 Llama 3.2 (Ollama) integration
+- 💬 Chat interface built with Streamlit
+- 📑 Displays the source document and page number
+- 🚫 Prevents duplicate PDF uploads
+- ⚡ Automatically processes newly uploaded PDFs
+- 💾 Persistent Chroma vector database
+- 🧠 Context-aware Retrieval-Augmented Generation (RAG)
 
-## How It Works
+---
 
-1. PDF documents are loaded using PyPDFLoader.
-2. Documents are split into smaller text chunks.
-3. Hugging Face sentence-transformer embeddings are generated.
-4. Embeddings are stored in ChromaDB.
-5. The user's question is converted into an embedding.
-6. ChromaDB retrieves the most relevant document chunks.
-7. Irrelevant results are filtered using a relevance threshold.
-8. The retrieved context and question are sent to Llama 3.2.
-9. The model generates an answer based only on the retrieved context.
-10. The application displays the answer together with the source documents and page numbers.
-
-## RAG Architecture
-
-User Question
-
-↓
-
-Semantic Search
-
-↓
-
-ChromaDB Vector Database
-
-↓
-
-Relevant Document Chunks
-
-↓
-
-Context + Question
-
-↓
-
-Llama 3.2
-
-↓
-
-Generated Answer
-
-↓
-
-Sources and Page Citations
-
-## Technologies
+## Tech Stack
 
 - Python
 - Streamlit
 - LangChain
 - ChromaDB
-- Hugging Face Sentence Transformers
+- HuggingFace Embeddings
 - Ollama
 - Llama 3.2
-- PyPDF
+- PyPDFLoader
+
+---
+
+## Project Structure
+
+```
+rag-healthcare-chatbot/
+│
+├── app.py                  # Streamlit application
+├── ingest.py               # Build the initial knowledge base
+├── retrieve.py             # Retrieve relevant documents
+├── rag_answer.py           # Generate answers
+├── requirements.txt
+│
+├── chroma_db/              # Persistent vector database
+├── data/
+│   ├── pdfs/               # Built-in healthcare PDFs
+│   ├── uploads/            # User uploaded PDFs
+│   └── processed_hashes.txt
+│
+└── README.md
+```
+
+---
 
 ## Installation
 
-Clone the repository:
+Clone the repository
 
 ```bash
-git clone YOUR_REPOSITORY_URL
+git clone https://github.com/salehpour1367/rag-healthcare-chatbot.git
 cd rag-healthcare-chatbot
+```
+
+Create a virtual environment
+
+```bash
+python -m venv .venv
+```
+
+Activate it (Windows)
+
+```bash
+.venv\Scripts\activate
+```
+
+Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+Install Ollama and download the model
+
+```bash
+ollama pull llama3.2:3b
+```
+
+Run the application
+
+```bash
+streamlit run app.py
+```
+
+---
+
+## How It Works
+
+1. Load the built-in healthcare knowledge base.
+2. Upload one or more healthcare PDF documents.
+3. PDFs are automatically processed and converted into embeddings.
+4. Chunks are stored in ChromaDB.
+5. User questions are converted into embeddings.
+6. The most relevant chunks are retrieved.
+7. Llama 3.2 generates an answer using only the retrieved context.
+8. The chatbot displays both the answer and the supporting sources.
+
+---
+
+## Future Improvements
+
+- Support DOCX and TXT documents
+- Conversation memory
+- Medical citation formatting
+- Cloud deployment
+- User authentication
+- Multi-language support
+
+---
+
+## License
+
+This project is licensed under the MIT License.
