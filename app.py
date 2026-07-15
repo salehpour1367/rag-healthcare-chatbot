@@ -270,6 +270,7 @@ if question:
             k=4
         )
     )
+    st.write(results_with_scores)
 
     #RELEVANCE_THRESHOLD = 0.4
 
