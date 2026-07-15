@@ -26,6 +26,11 @@ uploaded_chroma_db/
 # OS files
 .DS_Store
 Thumbs.db
+# Chroma vector database
+chroma_db/
 
+# Chroma temporary files
+*.sqlite3
+*.bin
 # Logs
 *.log
