@@ -1,4 +1,4 @@
-# Virtual environment
+# Virtual environments
 .venv/
 venv/
 
@@ -14,13 +14,16 @@ __pycache__/
 .idea/
 .vscode/
 
-# Uploaded user documents
+# User-uploaded files
 data/uploads/
 
-# Temporary databases
+# Runtime state
+data/processed_hashes.txt
+
+# Temporary vector databases
 uploaded_chroma_db/
 
-# Operating system files
+# OS files
 .DS_Store
 Thumbs.db
 
