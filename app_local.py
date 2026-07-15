@@ -5,7 +5,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 import streamlit as st
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
-from huggingface_hub import InferenceClient
+from langchain_ollama import ChatOllama
 
 CHROMA_FOLDER = "chroma_db"
 UPLOAD_FOLDER = "data/uploads"
@@ -32,21 +32,6 @@ def load_embeddings():
         model_name="sentence-transformers/all-MiniLM-L6-v2"
     )
 
-@st.cache_resource
-def load_llm_client():
-    hf_token = os.getenv("HF_TOKEN")
-
-    # Local fallback from .streamlit/secrets.toml
-    if not hf_token:
-        hf_token = st.secrets.get("HF_TOKEN")
-
-    if not hf_token:
-        raise ValueError(
-            "HF_TOKEN was not found. Add it to local Streamlit secrets "
-            "or to the Hugging Face Space secrets."
-        )
-
-    return InferenceClient(token=hf_token)
 
 @st.cache_resource
 def load_vectorstore():
@@ -56,14 +41,16 @@ def load_vectorstore():
     )
 
 @st.cache_resource
-def load_llm_client():
-    return InferenceClient(
-        api_key=st.secrets["HF_TOKEN"]
+def load_llm():
+    return ChatOllama(
+        model="llama3.2:3b",
+        temperature=0
     )
 
 
+
 vectorstore = load_vectorstore()
-llm_client = load_llm_client()
+#llm = load_llm()
 
 if "active_vectorstore" not in st.session_state:
     st.session_state.active_vectorstore = vectorstore
@@ -328,28 +315,9 @@ ANSWER:
 
     with st.chat_message("assistant"):
         with st.spinner("Loading the AI model and searching the documents..."):
-            llm_client = load_llm_client()
-            response = llm_client.chat_completion(
-                model="meta-llama/Llama-3.1-8B-Instruct",
-                messages=[
-                    {
-                        "role": "system",
-                        "content": (
-                            "You are a healthcare document assistant. "
-                            "Use only the provided document context. "
-                            "Do not use outside knowledge."
-                        )
-                    },
-                    {
-                        "role": "user",
-                        "content": prompt
-                    }
-                ],
-                temperature=0,
-                max_tokens=400
-            )
-
-            answer = response.choices[0].message.content
+            llm = load_llm()
+            response = llm.invoke(prompt)
+            answer = response.content
 
         st.markdown(answer)
 

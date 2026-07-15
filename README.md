@@ -1,3 +1,13 @@
+---
+title: Healthcare RAG Chatbot
+emoji: 🩺
+colorFrom: blue
+colorTo: green
+sdk: docker
+app_port: 7860
+pinned: false
+license: mit
+---
 # 🩺 Healthcare RAG Chatbot
 
 An AI-powered Retrieval-Augmented Generation (RAG) chatbot that answers healthcare-related questions using PDF documents.
