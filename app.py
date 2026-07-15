@@ -271,12 +271,11 @@ if question:
         )
     )
 
-    RELEVANCE_THRESHOLD = 0.4
+    #RELEVANCE_THRESHOLD = 0.4
 
     results = [
         doc
         for doc, score in results_with_scores
-        if score >= RELEVANCE_THRESHOLD
     ]
     # Stop if no relevant information was found
     if not results:
