@@ -196,11 +196,30 @@ if st.sidebar.button("Clear Chat"):
     st.session_state.messages = []
     st.rerun()
 
+document_count = (
+    st.session_state.active_vectorstore
+    ._collection
+    .count()
+)
+
+st.sidebar.metric(
+    "Knowledge base chunks",
+    document_count
+)
+
 uploaded_files = st.sidebar.file_uploader(
     "Upload one or more healthcare PDFs",
     type=["pdf"],
     accept_multiple_files=True
 )
+st.sidebar.success("Knowledge base ready")
+
+if uploaded_files:
+    st.sidebar.markdown("### Uploaded documents")
+
+    for uploaded_file in uploaded_files:
+        st.sidebar.write(f"• {uploaded_file.name}")
+
 if uploaded_files:
     try:
         with st.sidebar:
