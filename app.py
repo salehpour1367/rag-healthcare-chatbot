@@ -192,6 +192,9 @@ def get_file_hash(uploaded_file):
 
 
 st.sidebar.header("Documents")
+if st.sidebar.button("Clear Chat"):
+    st.session_state.messages = []
+    st.rerun()
 
 uploaded_files = st.sidebar.file_uploader(
     "Upload one or more healthcare PDFs",
