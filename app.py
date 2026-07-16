@@ -202,10 +202,6 @@ document_count = (
     .count()
 )
 
-st.sidebar.metric(
-    "Knowledge base chunks",
-    document_count
-)
 
 uploaded_files = st.sidebar.file_uploader(
     "Upload one or more healthcare PDFs",
