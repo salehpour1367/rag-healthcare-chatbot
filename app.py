@@ -281,9 +281,15 @@ for message in st.session_state.messages:
             with st.expander("View sources"):
                 for source in message["sources"]:
                     st.markdown(
-                        f"**{source['name']} — Page {source['page']}**"
+                        f"**📄 {source['name']} — Page {source['page']}**"
                     )
-                    st.write(source["text"])
+
+                    preview = source["text"].strip()
+
+                    if len(preview) > 300:
+                        preview = preview[:300] + "..."
+
+                    st.write(preview)
 
 # Download conversation
 if st.session_state.messages:
@@ -336,21 +342,66 @@ if question:
     with st.chat_message("user"):
         st.markdown(question)
 
-    # Retrieve relevant PDF sections
-    results_with_scores = (
-        st.session_state.active_vectorstore
-        .similarity_search_with_relevance_scores(
-            question,
-            k=4
-        )
+    # Retrieve diverse document chunks using MMR
+    retriever = st.session_state.active_vectorstore.as_retriever(
+        search_type="mmr",
+        search_kwargs={
+            "k": 6,
+            "fetch_k": 20,
+            "lambda_mult": 0.7,
+        },
     )
 
-    #RELEVANCE_THRESHOLD = 0.4
+    retrieved_docs = retriever.invoke(question)
 
-    results = [
-        doc
-        for doc, score in results_with_scores
-    ]
+    # Remove duplicate chunks and repeated sources
+    results = []
+    seen_chunks = set()
+    seen_source_pages = set()
+
+    for doc in retrieved_docs:
+        source_name = doc.metadata.get(
+            "uploaded_filename",
+            doc.metadata.get(
+                "title",
+                doc.metadata.get("source", "PDF document")
+            )
+        )
+
+        page = doc.metadata.get(
+            "page_label",
+            doc.metadata.get("page", "Unknown")
+        )
+
+        normalized_text = " ".join(
+            doc.page_content.lower().split()
+        )
+
+        chunk_key = (
+            source_name,
+            str(page),
+            normalized_text[:300]
+        )
+
+        source_page_key = (
+            source_name,
+            str(page)
+        )
+
+        # Skip exact or near-duplicate chunks
+        if chunk_key in seen_chunks:
+            continue
+
+        # Show only one chunk from the same file and page
+        if source_page_key in seen_source_pages:
+            continue
+
+        seen_chunks.add(chunk_key)
+        seen_source_pages.add(source_page_key)
+        results.append(doc)
+
+        if len(results) == 3:
+            break
     # Stop if no relevant information was found
     if not results:
         answer = "I could not find relevant information in the provided document."
@@ -433,7 +484,10 @@ ANSWER:
         st.markdown("## 📚 Sources")
 
         for i, doc in enumerate(results):
-            page = doc.metadata.get("page_label", "Unknown")
+            page = doc.metadata.get(
+                "page_label",
+                doc.metadata.get("page", "Unknown")
+            )
 
             source_name = doc.metadata.get(
                 "uploaded_filename",
