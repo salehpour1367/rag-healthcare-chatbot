@@ -27,7 +27,27 @@ st.caption(
     "Educational use only. This chatbot does not provide medical "
     "diagnosis, treatment, or professional medical advice."
 )
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
+if len(st.session_state.messages) == 0:
+
+    st.info(
+        """
+👋 **Welcome!**
+
+This AI assistant answers healthcare questions using its knowledge base and uploaded PDF documents.
+
+### What you can do
+
+✅ Ask questions about healthcare topics
+
+✅ Upload one or more healthcare PDF files
+
+✅ View the document sources used to generate answers
+
+"""
+    )
 with st.expander("💡 Example questions"):
     st.markdown("""
 - What foods should a person with diabetes eat?
@@ -256,38 +276,7 @@ if uploaded_files:
 
 
 # Create chat history
-if "messages" not in st.session_state:
-    st.session_state.messages = []
 
-if len(st.session_state.messages) == 0:
-
-    st.info(
-        """
-👋 **Welcome!**
-
-This AI assistant answers healthcare questions using its knowledge base and uploaded PDF documents.
-
-### What you can do
-
-✅ Ask questions about healthcare topics
-
-✅ Upload one or more healthcare PDF files
-
-✅ View the document sources used to generate answers
-
-### Try asking:
-
-• What foods should a person with diabetes eat?
-
-• What is the Diabetes Plate Method?
-
-• Which foods contain carbohydrates?
-
-• What drinks are recommended?
-
-• What are healthy snack options?
-"""
-    )
 # Display previous messages
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
