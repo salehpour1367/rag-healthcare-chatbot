@@ -18,11 +18,6 @@ st.set_page_config(
 
 st.title("🩺 Healthcare RAG Chatbot")
 
-st.write(
-    "Ask questions using the built-in healthcare knowledge base "
-    "or upload additional healthcare PDF documents."
-)
-
 st.caption(
     "Educational use only. This chatbot does not provide medical "
     "diagnosis, treatment, or professional medical advice."
