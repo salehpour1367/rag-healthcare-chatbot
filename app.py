@@ -10,7 +10,6 @@ from huggingface_hub import InferenceClient
 CHROMA_FOLDER = "chroma_db"
 UPLOAD_FOLDER = "data/uploads"
 
-PROCESSED_HASHES_FILE = "data/processed_hashes.txt"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 st.set_page_config(
     page_title="Healthcare RAG Chatbot",
@@ -55,11 +54,6 @@ def load_vectorstore():
         embedding_function=load_embeddings()
     )
 
-@st.cache_resource
-def load_llm_client():
-    return InferenceClient(
-        api_key=st.secrets["HF_TOKEN"]
-    )
 
 
 vectorstore = load_vectorstore()
@@ -68,9 +62,56 @@ llm_client = load_llm_client()
 if "active_vectorstore" not in st.session_state:
     st.session_state.active_vectorstore = vectorstore
 
+
+
+if "processed_file_hashes" not in st.session_state:
+    st.session_state.processed_file_hashes = set()
+
+def initialize_builtin_documents(active_vectorstore):
+    # Do nothing if the database already contains documents
+    if active_vectorstore._collection.count() > 0:
+        return
+
+    pdf_folder = "data/pdfs"
+
+    if not os.path.exists(pdf_folder):
+        return
+
+    all_documents = []
+
+    for filename in os.listdir(pdf_folder):
+        if not filename.lower().endswith(".pdf"):
+            continue
+
+        file_path = os.path.join(pdf_folder, filename)
+        documents = PyPDFLoader(file_path).load()
+
+        for document in documents:
+            document.metadata["uploaded_filename"] = filename
+
+        all_documents.extend(
+            document
+            for document in documents
+            if document.page_content.strip()
+        )
+
+    if not all_documents:
+        return
+
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=1200,
+        chunk_overlap=100
+    )
+
+    chunks = text_splitter.split_documents(all_documents)
+
+    if chunks:
+        active_vectorstore.add_documents(chunks)
+initialize_builtin_documents(
+    st.session_state.active_vectorstore
+)
 def process_uploaded_pdfs(uploaded_files, active_vectorstore):
     all_documents = []
-    processed_hashes = load_processed_hashes()
     pending_hashes = []
     new_file_count = 0
     skipped_files = []
@@ -80,7 +121,7 @@ def process_uploaded_pdfs(uploaded_files, active_vectorstore):
     for uploaded_file in uploaded_files:
         file_hash = get_file_hash(uploaded_file)
 
-        if file_hash in processed_hashes:
+        if file_hash in st.session_state.processed_file_hashes:
             skipped_files.append(uploaded_file.name)
             continue
 
@@ -132,16 +173,11 @@ def process_uploaded_pdfs(uploaded_files, active_vectorstore):
         raise ValueError(
             "No readable text chunks were created from the uploaded PDFs."
         )
-    st.write(f"Pages loaded: {len(all_documents)}")
-    st.write(f"Chunks created: {len(chunks)}")
 
-    # Add documents first
     active_vectorstore.add_documents(chunks)
-    st.success("Documents added to Chroma!")
 
-    # Save hashes only after successful database insertion
     for file_hash in pending_hashes:
-        save_processed_hash(file_hash)
+        st.session_state.processed_file_hashes.add(file_hash)
 
     return (
         new_file_count,
@@ -153,32 +189,6 @@ def get_file_hash(uploaded_file):
     return hashlib.sha256(uploaded_file.getvalue()).hexdigest()
 
 
-def load_processed_hashes():
-    if not os.path.exists(PROCESSED_HASHES_FILE):
-        return set()
-
-    with open(PROCESSED_HASHES_FILE, "r", encoding="utf-8") as file:
-        return {
-            line.strip()
-            for line in file
-            if line.strip()
-        }
-
-
-def save_processed_hash(file_hash):
-    os.makedirs(os.path.dirname(PROCESSED_HASHES_FILE), exist_ok=True)
-
-    with open(PROCESSED_HASHES_FILE, "a", encoding="utf-8") as file:
-        file.write(file_hash + "\n")
-
-def create_files_fingerprint(uploaded_files):
-    hasher = hashlib.sha256()
-
-    for uploaded_file in uploaded_files:
-        hasher.update(uploaded_file.name.encode("utf-8"))
-        hasher.update(uploaded_file.getvalue())
-
-    return hasher.hexdigest()
 
 
 st.sidebar.header("Documents")
@@ -188,48 +198,40 @@ uploaded_files = st.sidebar.file_uploader(
     type=["pdf"],
     accept_multiple_files=True
 )
-
-
-if "processed_files_fingerprint" not in st.session_state:
-    st.session_state.processed_files_fingerprint = None
-
 if uploaded_files:
-    current_fingerprint = create_files_fingerprint(uploaded_files)
-
-    if current_fingerprint != st.session_state.processed_files_fingerprint:
-        try:
-            with st.sidebar:
-                with st.spinner("Adding PDFs to the knowledge base..."):
-                    (
-                        file_count,
-                        page_count,
-                        chunk_count,
-                        skipped_files
-                    ) = process_uploaded_pdfs(
-                        uploaded_files,
-                        st.session_state.active_vectorstore
-                    )
-
-            st.session_state.processed_files_fingerprint = current_fingerprint
-
-
-            if file_count > 0:
-                st.sidebar.success(
-                    f"Added {file_count} new PDF files, "
-                    f"{page_count} pages, and "
-                    f"{chunk_count} chunks."
+    try:
+        with st.sidebar:
+            with st.spinner("Adding PDFs to the knowledge base..."):
+                (
+                    file_count,
+                    page_count,
+                    chunk_count,
+                    skipped_files
+                ) = process_uploaded_pdfs(
+                    uploaded_files,
+                    st.session_state.active_vectorstore
                 )
 
-            if skipped_files:
-                st.sidebar.info(
-                    "Already in the knowledge base: "
-                    + ", ".join(skipped_files)
-                )
-
-        except Exception as error:
-            st.sidebar.error(
-                f"Could not process the PDFs: {error}"
+        if file_count > 0:
+            st.sidebar.success(
+                f"Added {file_count} new PDF files, "
+                f"{page_count} pages, and "
+                f"{chunk_count} chunks."
             )
+
+        if skipped_files:
+            st.sidebar.info(
+                "Already processed in this session: "
+                + ", ".join(skipped_files)
+            )
+
+    except Exception as error:
+        st.sidebar.error(
+            f"Could not process the PDFs: {error}"
+        )
+
+
+
 # Create chat history
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -273,7 +275,6 @@ if question:
             k=4
         )
     )
-    st.write(results_with_scores)
 
     #RELEVANCE_THRESHOLD = 0.4
 
@@ -330,8 +331,7 @@ ANSWER:
 """
 
     with st.chat_message("assistant"):
-        with st.spinner("Loading the AI model and searching the documents..."):
-            llm_client = load_llm_client()
+        with st.spinner("Searching the documents and generating an answer..."):
             response = llm_client.chat_completion(
                 model="meta-llama/Llama-3.1-8B-Instruct",
                 messages=[
