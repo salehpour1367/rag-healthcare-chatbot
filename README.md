@@ -20,7 +20,6 @@ https://github.com/salehpour1367/rag-healthcare-chatbot
 
 ### Home Page
 
-> Replace with a screenshot of the main interface.
 
 ![Home](images/home.png)
 
@@ -37,12 +36,6 @@ https://github.com/salehpour1367/rag-healthcare-chatbot
 ### Upload PDF
 
 ![Upload](images/upload.png)
-
----
-
-### Source Citations
-
-![Sources](images/sources.png)
 
 ---
 
