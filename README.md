@@ -1,106 +1,128 @@
----
-title: Healthcare RAG Chatbot
-emoji: 🩺
-colorFrom: blue
-colorTo: green
-sdk: docker
-app_port: 7860
-pinned: false
-license: mit
----
 # 🩺 Healthcare RAG Chatbot
 
-An AI-powered Retrieval-Augmented Generation (RAG) chatbot that answers healthcare-related questions using PDF documents.
+An AI-powered Retrieval-Augmented Generation (RAG) chatbot that answers healthcare questions using trusted PDF documents.
 
-The chatbot combines semantic search with a Large Language Model (LLM) to retrieve relevant information from healthcare PDFs and generate accurate, context-based answers.
+🌐 **Live Demo:** https://rag-healthcare-chatbot.streamlit.app
+
+---
+
+## Overview
+
+The Healthcare RAG Chatbot enables users to ask questions about healthcare topics and receive answers based only on the provided documents.
+
+The chatbot combines semantic search with a Large Language Model (LLM) to generate accurate, document-grounded responses while displaying the source pages used for each answer.
 
 ---
 
 ## Features
 
-- 📄 Ask questions about healthcare PDF documents
-- 📚 Built-in healthcare knowledge base
-- ➕ Upload one or multiple PDF files
-- 🔍 Semantic search using vector embeddings
-- 🤖 Llama 3.2 (Ollama) integration
-- 💬 Chat interface built with Streamlit
-- 📑 Displays the source document and page number
-- 🚫 Prevents duplicate PDF uploads
-- ⚡ Automatically processes newly uploaded PDFs
-- 💾 Persistent Chroma vector database
-- 🧠 Context-aware Retrieval-Augmented Generation (RAG)
+- ✅ Built-in healthcare knowledge base
+- ✅ Upload one or more healthcare PDF documents
+- ✅ Automatic PDF processing
+- ✅ Semantic search using ChromaDB
+- ✅ Hugging Face sentence embeddings
+- ✅ AI-generated answers using Llama 3.1
+- ✅ Source citations with page numbers
+- ✅ Multiple PDF support
+- ✅ Duplicate upload prevention (per session)
+- ✅ Interactive Streamlit interface
+- ✅ Cloud deployment
 
 ---
 
-## Tech Stack
+## Architecture
+
+```
+                    User
+                      │
+                      ▼
+              Streamlit Web App
+                      │
+                      ▼
+          LangChain Retrieval Pipeline
+                      │
+        ┌─────────────┴─────────────┐
+        │                           │
+        ▼                           ▼
+  Chroma Vector DB          Hugging Face
+ (Semantic Search)         Llama 3.1 Inference
+        │
+        ▼
+ Retrieved PDF Chunks
+        │
+        ▼
+  AI-generated Answer
+```
+
+---
+
+## Technologies
 
 - Python
 - Streamlit
 - LangChain
 - ChromaDB
-- HuggingFace Embeddings
-- Ollama
-- Llama 3.2
-- PyPDFLoader
+- Hugging Face Embeddings
+- Hugging Face Inference API
+- Llama 3.1
+- Sentence Transformers
+- PyPDF
+- Git
+- GitHub
 
 ---
 
 ## Project Structure
 
-```
-rag-healthcare-chatbot/
+```text
+Healthcare-RAG-Chatbot/
 │
-├── app.py                  # Streamlit application
-├── ingest.py               # Build the initial knowledge base
-├── retrieve.py             # Retrieve relevant documents
-├── rag_answer.py           # Generate answers
+├── app.py
+├── app_local.py
 ├── requirements.txt
-│
-├── chroma_db/              # Persistent vector database
+├── README.md
+├── chroma_db/
 ├── data/
-│   ├── pdfs/               # Built-in healthcare PDFs
-│   ├── uploads/            # User uploaded PDFs
-│   └── processed_hashes.txt
-│
-└── README.md
+│   ├── pdfs/
+│   └── uploads/
+└── .streamlit/
 ```
 
 ---
 
 ## Installation
 
-Clone the repository
+Clone the repository:
 
 ```bash
 git clone https://github.com/salehpour1367/rag-healthcare-chatbot.git
+```
+
+Go to the project folder:
+
+```bash
 cd rag-healthcare-chatbot
 ```
 
-Create a virtual environment
-
-```bash
-python -m venv .venv
-```
-
-Activate it (Windows)
-
-```bash
-.venv\Scripts\activate
-```
-
-Install dependencies
+Install the required packages:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Install Ollama and download the model
+Create a Streamlit secrets file:
 
-```bash
-ollama pull llama3.2:3b
+```text
+.streamlit/secrets.toml
 ```
 
-Run the application
+Add your Hugging Face token:
+
+```toml
+HF_TOKEN = "your_huggingface_token"
+```
+
+Run the application:
 
 ```bash
 streamlit run app.py
@@ -108,30 +130,65 @@ streamlit run app.py
 
 ---
 
-## How It Works
+## Example Questions
 
-1. Load the built-in healthcare knowledge base.
-2. Upload one or more healthcare PDF documents.
-3. PDFs are automatically processed and converted into embeddings.
-4. Chunks are stored in ChromaDB.
-5. User questions are converted into embeddings.
-6. The most relevant chunks are retrieved.
-7. Llama 3.2 generates an answer using only the retrieved context.
-8. The chatbot displays both the answer and the supporting sources.
+- What foods should a person with diabetes eat?
+- What is the Diabetes Plate Method?
+- Which foods contain carbohydrates?
+- What drinks are recommended for people with diabetes?
+- What are healthy snack options?
+
+---
+
+## Screenshots
+
+### Home Page
+
+*(Add a screenshot here)*
+
+### Asking a Question
+
+*(Add a screenshot here)*
+
+### Uploading PDFs
+
+*(Add a screenshot here)*
+
+### Source Citations
+
+*(Add a screenshot here)*
 
 ---
 
 ## Future Improvements
 
-- Support DOCX and TXT documents
 - Conversation memory
-- Medical citation formatting
-- Cloud deployment
-- User authentication
+- OCR support for scanned PDFs
 - Multi-language support
+- Medical document summarization
+- Citation highlighting
+- User authentication
+
+---
+
+## Disclaimer
+
+This application is intended for educational and research purposes only.
+
+It does **not** provide medical diagnosis, treatment, or professional healthcare advice.
+
+Always consult a qualified healthcare professional for medical decisions.
 
 ---
 
 ## License
 
-This project is licensed under the MIT License.
+MIT License
+
+---
+
+## Author
+
+**Simintaj Salehpour**
+
+GitHub: https://github.com/salehpour1367
