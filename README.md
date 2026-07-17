@@ -1,125 +1,180 @@
 # 🩺 Healthcare RAG Chatbot
 
-An AI-powered Retrieval-Augmented Generation (RAG) chatbot that answers healthcare questions using trusted PDF documents.
+A Retrieval-Augmented Generation (RAG) chatbot that answers healthcare-related questions using trusted PDF documents. The application combines semantic search with a Large Language Model (LLM) to generate accurate, context-aware responses while citing the source documents used.
 
-🌐 **Live Demo:** https://rag-healthcare-chatbot.streamlit.app
-
----
-
-## Overview
-
-The Healthcare RAG Chatbot enables users to ask questions about healthcare topics and receive answers based only on the provided documents.
-
-The chatbot combines semantic search with a Large Language Model (LLM) to generate accurate, document-grounded responses while displaying the source pages used for each answer.
+> ⚠️ **Disclaimer:** This project is intended for educational and demonstration purposes only. It does not provide medical diagnosis, treatment, or professional healthcare advice.
 
 ---
 
-## Features
+## 🚀 Live Demo
 
-- ✅ Built-in healthcare knowledge base
-- ✅ Upload one or more healthcare PDF documents
-- ✅ Automatic PDF processing
-- ✅ Semantic search using ChromaDB
-- ✅ Hugging Face sentence embeddings
-- ✅ AI-generated answers using Llama 3.1
-- ✅ Source citations with page numbers
-- ✅ Multiple PDF support
-- ✅ Duplicate upload prevention (per session)
-- ✅ Interactive Streamlit interface
-- ✅ Cloud deployment
+**Streamlit App:**  
+https://your-streamlit-url.streamlit.app
+
+**GitHub Repository:**  
+https://github.com/salehpour1367/rag-healthcare-chatbot
 
 ---
 
-## Architecture
+## 📸 Screenshots
+
+### Home Page
+
+> Replace with a screenshot of the main interface.
+
+![Home](images/home.png)
+
+---
+
+### Ask a Question
+
+> Example: "What foods should a person with diabetes eat?"
+
+![Question](images/question.png)
+
+---
+
+### Upload PDF
+
+![Upload](images/upload.png)
+
+---
+
+### Source Citations
+
+![Sources](images/sources.png)
+
+---
+
+# 📖 Project Overview
+
+Healthcare professionals and students often need quick access to reliable information from medical documents.
+
+Instead of searching through hundreds of pages manually, this chatbot retrieves the most relevant document sections using semantic search and generates answers based only on the retrieved context.
+
+The chatbot also supports uploading additional healthcare PDFs, allowing users to extend the knowledge base without modifying the code.
+
+---
+
+# ✨ Features
+
+- Semantic search using sentence embeddings
+- Retrieval-Augmented Generation (RAG)
+- Built-in healthcare knowledge base
+- Upload one or multiple PDF documents
+- Automatic PDF processing
+- Source citation with page numbers
+- Conversation history
+- Duplicate PDF detection
+- Streamlit web interface
+- Cloud deployment
+
+---
+
+# 🏗 Architecture
 
 ```
-                    User
-                      │
-                      ▼
-              Streamlit Web App
-                      │
-                      ▼
-          LangChain Retrieval Pipeline
-                      │
-        ┌─────────────┴─────────────┐
-        │                           │
-        ▼                           ▼
-  Chroma Vector DB          Hugging Face
- (Semantic Search)         Llama 3.1 Inference
-        │
-        ▼
- Retrieved PDF Chunks
-        │
-        ▼
-  AI-generated Answer
+                  User
+                    │
+                    ▼
+           Streamlit Interface
+                    │
+                    ▼
+          User Question / PDF Upload
+                    │
+                    ▼
+      HuggingFace Embeddings
+                    │
+                    ▼
+             Chroma Vector DB
+                    │
+          Similarity Search
+                    │
+                    ▼
+      Retrieved Document Chunks
+                    │
+                    ▼
+        Llama 3.1 (Inference API)
+                    │
+                    ▼
+          Final Answer + Sources
 ```
 
 ---
 
-## Technologies
+# 🛠 Technologies
 
 - Python
 - Streamlit
 - LangChain
 - ChromaDB
-- Hugging Face Embeddings
+- HuggingFace Embeddings
 - Hugging Face Inference API
-- Llama 3.1
-- Sentence Transformers
-- PyPDF
-- Git
-- GitHub
+- Meta Llama 3.1 8B Instruct
+- PyPDFLoader
+- RecursiveCharacterTextSplitter
 
 ---
 
-## Project Structure
+# 📂 Project Structure
 
-```text
-Healthcare-RAG-Chatbot/
+```
+rag-healthcare-chatbot/
 │
 ├── app.py
-├── app_local.py
 ├── requirements.txt
 ├── README.md
+│
 ├── chroma_db/
+│
 ├── data/
 │   ├── pdfs/
 │   └── uploads/
-└── .streamlit/
+│
+└── images/
 ```
 
 ---
 
-## Installation
+# ⚙️ Installation
 
 Clone the repository:
 
 ```bash
 git clone https://github.com/salehpour1367/rag-healthcare-chatbot.git
-```
-
-Go to the project folder:
-
-```bash
 cd rag-healthcare-chatbot
 ```
 
-Install the required packages:
+Create a virtual environment:
+
+```bash
+python -m venv venv
+```
+
+Activate it.
+
+Windows
+
+```bash
+venv\Scripts\activate
+```
+
+macOS/Linux
+
+```bash
+source venv/bin/activate
+```
+
+Install dependencies:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Create a Streamlit secrets file:
-
-```text
-.streamlit/secrets.toml
-```
-
-Add your Hugging Face token:
+Create a `.streamlit/secrets.toml` file:
 
 ```toml
-HF_TOKEN = "your_huggingface_token"
+HF_TOKEN="your_huggingface_token"
 ```
 
 Run the application:
@@ -130,7 +185,7 @@ streamlit run app.py
 
 ---
 
-## Example Questions
+# 💬 Example Questions
 
 - What foods should a person with diabetes eat?
 - What is the Diabetes Plate Method?
@@ -140,55 +195,41 @@ streamlit run app.py
 
 ---
 
-## Screenshots
+# 📚 How It Works
 
-### Home Page
-
-*(Add a screenshot here)*
-
-### Asking a Question
-
-*(Add a screenshot here)*
-
-### Uploading PDFs
-
-*(Add a screenshot here)*
-
-### Source Citations
-
-*(Add a screenshot here)*
+1. User enters a healthcare question.
+2. The question is converted into an embedding.
+3. ChromaDB retrieves the most relevant document chunks.
+4. The retrieved context is sent to Llama 3.1.
+5. The LLM generates an answer using only the retrieved information.
+6. The application displays the answer together with the document sources.
 
 ---
 
-## Future Improvements
+# 📌 Future Improvements
 
-- Conversation memory
+- Support additional medical document collections
 - OCR support for scanned PDFs
-- Multi-language support
-- Medical document summarization
-- Citation highlighting
 - User authentication
+- Conversation export
+- Feedback and rating system
+- Hybrid search (keyword + semantic)
 
 ---
 
-## Disclaimer
-
-This application is intended for educational and research purposes only.
-
-It does **not** provide medical diagnosis, treatment, or professional healthcare advice.
-
-Always consult a qualified healthcare professional for medical decisions.
-
----
-
-## License
-
-MIT License
-
----
-
-## Author
+# 👨‍💻 Author
 
 **Simintaj Salehpour**
 
-GitHub: https://github.com/salehpour1367
+M.S. Data Science  
+George Washington University
+
+GitHub:
+
+https://github.com/salehpour1367
+
+---
+
+# 📄 License
+
+This project is licensed under the MIT License.
